@@ -62,9 +62,9 @@ public class Triangle extends Forme {
 	
 			
 		System.out.println (" TRIANGLE: " +getNom() +
-				" Point 1 : " + getPoint1().x + " "+ getPoint1().y +
-				" Point 2 : " + getPoint2().x + " "+ getPoint2().y + 
-				" Point 3 : " + getPoint3().x + " "+ getPoint3().y     );
+				" Point 1 = (" + getPoint1().x + " "+ getPoint1().y +")"+
+				" Point 2 = (" + getPoint2().x + " "+ getPoint2().y +")"+ 
+				" Point 3 = (" + getPoint3().x + " "+ getPoint3().y  +")"   );
 			
 	}
 

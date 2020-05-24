@@ -2,8 +2,6 @@ package main.java.forme;
 
 import java.awt.Point;
 
-import main.java.forme.GraphicForme.TYPE_FORME;
-
 
 /**
  * Classe des cercles

@@ -2,8 +2,6 @@ package main.java.forme;
 
 import java.io.Serializable;
 
-import main.java.forme.GraphicForme.TYPE_FORME;
-
 
 /**
  * Classe Forme

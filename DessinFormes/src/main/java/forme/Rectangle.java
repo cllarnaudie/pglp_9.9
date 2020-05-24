@@ -2,8 +2,6 @@ package main.java.forme;
 
 import java.awt.Point;
 
-import main.java.forme.GraphicForme.TYPE_FORME;
-
 /**
  * 
  * @author claire
@@ -63,8 +61,8 @@ public class Rectangle extends Forme  {
 	 */
 	public  void affiche()  {
 		
-			System.out.println (" RECTANGLE : " +getNom() + " Point Haut Gauche : " + getPointHautGauche().x + " "+
-		getPointHautGauche().y +  " Largeur : "+ getLargeur()  +" Longueur : "+ getLongueur()  );
+			System.out.println (" RECTANGLE : " +getNom() + " Point Haut Gauche = ( " + getPointHautGauche().x + " "+
+		getPointHautGauche().y +  ") Largeur = "+ getLargeur()  +" Longueur = "+ getLongueur()  );
 			
 		
 	}
