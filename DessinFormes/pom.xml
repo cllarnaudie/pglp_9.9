@@ -72,7 +72,7 @@
               <archive>
                   <manifest>
                       <mainClass>
-                          DessinFormes
+                          DessinFormes/main.java/DrawingApp
                       </mainClass>
                   </manifest>
               </archive>
