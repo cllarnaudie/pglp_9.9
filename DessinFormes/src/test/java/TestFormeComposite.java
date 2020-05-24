@@ -1,18 +1,12 @@
 package test.java;
 
 import java.awt.Point;
-import java.util.List;
 
 import org.junit.Test;
 
-import main.java.dao.CarreJdbcDao;
-import main.java.dao.CercleJdbcDao;
-import main.java.dao.RectangleJdbcDao;
-import main.java.dao.TriangleJdbcDao;
 import main.java.forme.Carre;
 import main.java.forme.Cercle;
 import main.java.forme.FormeComposite;
-import main.java.forme.GraphicForme;
 import main.java.forme.Rectangle;
 import main.java.forme.Triangle;
 
@@ -20,7 +14,7 @@ import main.java.forme.Triangle;
 public class TestFormeComposite {
 	
  	@Test
-	public void testCarre() {
+	public void testFormeComposite() {
 
 		System.out.println("\n Test de la forme Composite ");
 		
