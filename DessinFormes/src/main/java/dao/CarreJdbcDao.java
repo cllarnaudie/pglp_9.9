@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import main.java.forme.Carre;
 
@@ -33,6 +35,8 @@ public class CarreJdbcDao extends DAO <Carre>  {
 	// connexion a la base de donnees
 	Connection connect ;
 	
+	// nom du dessin
+	String nomDessin ;
 	
 	/**
 	 * Constructeur
@@ -52,9 +56,10 @@ public class CarreJdbcDao extends DAO <Carre>  {
 	 * Constructeur
 	 * @param connect
 	 */
-	public CarreJdbcDao (Connection connect ) {
+	public CarreJdbcDao (Connection connect, String nomDessin ) {
 				
 		this.connect = connect;
+		this.nomDessin = nomDessin;
 	}
 	
 	
@@ -75,14 +80,24 @@ public class CarreJdbcDao extends DAO <Carre>  {
 
 				try {
 					
-					String chaineSQL = "INSERT INTO CARRE (nom,xHautGauche,yHautGauche,cote) VALUES (?,?,?,?)";
+					String chaineSQL ;
+					
+					if (nomDessin != null) {
+					
+						chaineSQL = "INSERT INTO CARRE (nom,xHautGauche,yHautGauche,cote,nomDessin) VALUES (?,?,?,?,?)";
+					}
+					else {
+						chaineSQL = "INSERT INTO CARRE (nom,xHautGauche,yHautGauche,cote) VALUES (?,?,?,?)";
+					}
 
 					prepare = connect.prepareStatement(chaineSQL);
 					prepare.setString(1, carre.getNom());
 					prepare.setInt(2, carre.getPointHautGauche().x);
 					prepare.setInt(3, carre.getPointHautGauche().y);
 					prepare.setInt(4, carre.getCote());
-					
+					if (nomDessin != null) {
+						prepare.setString(5, nomDessin);
+					}
 
 					int result = prepare.executeUpdate();
 					
@@ -117,7 +132,8 @@ public class CarreJdbcDao extends DAO <Carre>  {
 			PreparedStatement prepare =null;
 
 
-			if (connect != null) {
+			// si la connexion a la base est OK et que le Carre est  deja cree en base
+			if ((connect != null)   && (find(carre.getNom()) != null) ){
 
 				try {
 
@@ -230,8 +246,47 @@ public class CarreJdbcDao extends DAO <Carre>  {
 	}
 
 	
-	
-	
+	/**
+	 * Recherche des carres à partir du nom du dessin
+	 * @param nomDessin
+	 * @return
+	 */
+	public List<Carre> findFormes(String nomDessin) {
+		List<Carre> res = new ArrayList<>();
+
+		PreparedStatement prepare =null;
+		if (connect != null) {
+
+			try {
+				prepare = connect.prepareStatement("SELECT * FROM CARRE WHERE nomDessin= ? ");
+
+				prepare.setString(1, nomDessin);
+
+				ResultSet result = prepare.executeQuery();
+
+				while (result.next()) {
+					String nom = result.getString("nom");
+					int x = result.getInt("xHautGauche");
+					int y = result.getInt("yHautGauche");
+					int cote = result.getInt("cote");
+					
+					
+					Carre carre = new Carre(nom,x,y,cote);
+					res.add(carre);
+
+				}
+			}
+			catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+
+
+		}
+
+		return res;
+
+	}
+
 	
 	
 	/**

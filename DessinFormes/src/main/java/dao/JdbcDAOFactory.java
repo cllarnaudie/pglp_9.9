@@ -16,31 +16,31 @@ public class JdbcDAOFactory  {
 
 	public  DAO <FormeComposite> getFormeCompositeDAO(String repertoireBase) {
 
-		return  new FormeCompositeJdbcDao("usersdb", repertoireBase);
+		return  new FormeCompositeJdbcDao("dessinbd", repertoireBase);
 
 	}
 
 	public  DAO <Carre> getCarreDAO(String repertoireBase) {
 
-		return  new CarreJdbcDao("usersdb", repertoireBase);
+		return  new CarreJdbcDao("dessinbd", repertoireBase);
 
 	}
 
 	public  DAO <Cercle> getCercleDAO(String repertoireBase) {
 
-		return  new CercleJdbcDao("usersdb", repertoireBase);
+		return  new CercleJdbcDao("dessinbd", repertoireBase);
 
 	}
 
 	public  DAO <Rectangle> getRectangleDAO(String repertoireBase) {
 
-		return  new RectangleJdbcDao("usersdb", repertoireBase);
+		return  new RectangleJdbcDao("dessinbd", repertoireBase);
 
 	}
 
 	public  DAO <Triangle> getTriangleDAO(String repertoireBase) {
 
-		return  new TriangleJdbcDao("usersdb", repertoireBase);
+		return  new TriangleJdbcDao("dessinbd", repertoireBase);
 
 	}
 

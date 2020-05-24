@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import main.java.forme.Cercle;
 
@@ -32,11 +34,13 @@ public class CercleJdbcDao extends DAO <Cercle>  {
 	
 	
 	// connexion a la base de donnees
-	Connection connect ;
+	Connection connect =null ;
 	
+	// dessin
+	String nomDessin = null;
 	
 	/**
-	 * 
+	 * Constructeur
 	 * @param nomBase
 	 * @param repertoireBase
 	 */
@@ -48,14 +52,15 @@ public class CercleJdbcDao extends DAO <Cercle>  {
 		connect = driver.getChaineConnexion();
 	}
 	
-	
 	/**
-	 * Constructeur
+	 *  Constructeur
 	 * @param connect
+	 * @param nomDessin
 	 */
-	public CercleJdbcDao (Connection connect ) {
+	public CercleJdbcDao (Connection connect,String nomDessin ) {
 				
 		this.connect = connect;
+		this.nomDessin = nomDessin;
 	}
 	
 	
@@ -75,14 +80,24 @@ public class CercleJdbcDao extends DAO <Cercle>  {
 			if ((connect != null)   && (find(cercle.getNom()) == null) ){
 
 				try {
+					String chaineSQL ;
 					
-					String chaineSQL = "INSERT INTO CERCLE (nom,centreX,centreY,rayon) VALUES (?,?,?,?)";
+					if (nomDessin != null) {
+						chaineSQL = "INSERT INTO CERCLE (nom,centreX,centreY,rayon,nomDessin) VALUES (?,?,?,?,?)";
+					}
+					else {
+						chaineSQL = "INSERT INTO CERCLE (nom,centreX,centreY,rayon) VALUES (?,?,?,?)";
+					}
 
 					prepare = connect.prepareStatement(chaineSQL);
 					prepare.setString(1, cercle.getNom());
 					prepare.setInt(2, cercle.getCentre().x);
 					prepare.setInt(3, cercle.getCentre().y);
 					prepare.setInt(4, cercle.getRayon());
+					
+					if (nomDessin != null) {
+						prepare.setString(5, nomDessin);
+					}
 
 					int result = prepare.executeUpdate();
 					
@@ -116,9 +131,9 @@ public class CercleJdbcDao extends DAO <Cercle>  {
 
 			PreparedStatement prepare =null;
 
-
-			if (connect != null) {
-
+			// si la connexion a la base est OK et que le cercle est  deja cree en base
+			if ((connect != null)   && (find(cercle.getNom()) != null) ){
+		
 				try {
 
 					String chaineSQL = "UPDATE CERCLE SET centreX = ?, centreY = ? WHERE nom = ?   ";
@@ -213,6 +228,51 @@ public class CercleJdbcDao extends DAO <Cercle>  {
 					int y = result.getInt("centreY");
 
 					res = new Cercle(nom, x, y, rayon);
+
+				}
+			}
+			catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+
+
+		}
+
+		return res;
+
+	}
+
+	
+	/**
+	 * Recherche des cercles à partir du nom du dessin
+	 * @param nom : nom du dessin
+	 * @return
+	 * 
+	 */
+	
+	public List<Cercle> findFormes(String nomDessin) {
+
+		List <Cercle> res = new ArrayList<>();
+
+		PreparedStatement prepare =null;
+		if (connect != null) {
+
+			try {
+				prepare = connect.prepareStatement("SELECT * FROM CERCLE WHERE nomDessin= ? ");
+
+				prepare.setString(1, nomDessin);
+
+				ResultSet result = prepare.executeQuery();
+
+				while (result.next()) {
+
+					String nom = result.getString("nom");
+					int rayon = result.getInt("rayon");
+					int x = result.getInt("centreX");
+					int y = result.getInt("centreY");
+
+					Cercle cercle = new Cercle(nom, x, y, rayon);
+					res.add(cercle);
 
 				}
 			}

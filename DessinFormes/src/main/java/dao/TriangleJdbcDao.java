@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import main.java.forme.Triangle;
 
@@ -40,6 +42,7 @@ public class TriangleJdbcDao extends DAO <Triangle>  {
 	// connexion a la base de donnees
 	Connection connect ;
 	
+	String nomDessin;
 	
 	/**
 	 * Constructeur
@@ -54,13 +57,16 @@ public class TriangleJdbcDao extends DAO <Triangle>  {
 		connect = driver.getChaineConnexion();
 	}
 	
+	
 	/**
-	 * Constructeur
+	 *  Constructeur
 	 * @param connect
+	 * @param nomDessin
 	 */
-	public TriangleJdbcDao (Connection connect ) {
+	public TriangleJdbcDao (Connection connect, String nomDessin ) {
 				
 		this.connect = connect;
+		this.nomDessin = nomDessin ;
 	}
 	
 	
@@ -80,9 +86,16 @@ public class TriangleJdbcDao extends DAO <Triangle>  {
 			if ((connect != null)   && (find(triangle.getNom()) == null) ){
 
 				try {
+					String chaineSQL ;
 					
-					String chaineSQL = "INSERT INTO TRIANGLE (nom,xPoint1,yPoint1,xPoint2,yPoint2,xPoint3,yPoint3) VALUES (?,?,?,?,?,?,?)";
+					if (nomDessin != null) {
+						chaineSQL = "INSERT INTO TRIANGLE (nom,xPoint1,yPoint1,xPoint2,yPoint2,xPoint3,yPoint3,nomDessin) VALUES (?,?,?,?,?,?,?,?)";
+					}
+					else {
+						chaineSQL = "INSERT INTO TRIANGLE (nom,xPoint1,yPoint1,xPoint2,yPoint2,xPoint3,yPoint3) VALUES (?,?,?,?,?,?,?)";
 
+					}
+						
 					prepare = connect.prepareStatement(chaineSQL);
 					
 					prepare.setString(1, triangle.getNom());
@@ -95,8 +108,10 @@ public class TriangleJdbcDao extends DAO <Triangle>  {
 					prepare.setInt(6, triangle.getPoint3().x);
 					prepare.setInt(7, triangle.getPoint3().y);
 					
+					if (nomDessin != null) {
+						prepare.setString(8, nomDessin);
+					}
 					
-
 					int result = prepare.executeUpdate();
 					
 					assert result == 1 ;
@@ -130,7 +145,8 @@ public class TriangleJdbcDao extends DAO <Triangle>  {
 			PreparedStatement prepare =null;
 
 
-			if (connect != null) {
+			// si la connexion a la base est OK et que le Triangle est  deja cree en base
+			if ((connect != null)   && (find(triangle.getNom()) != null) ){
 
 				try {
 
@@ -251,6 +267,53 @@ public class TriangleJdbcDao extends DAO <Triangle>  {
 	}
 
 	
+	/**
+	 *  Recherche des triangless à partir du nom du dessin
+	 * @param nomDessin
+	 * @return
+	 */
+	
+	public List<Triangle> findFormes(String nomDessin) {
+
+		List<Triangle> res = new ArrayList<>();
+
+		PreparedStatement prepare =null;
+		if (connect != null) {
+
+			try {
+				prepare = connect.prepareStatement("SELECT * FROM TRIANGLE WHERE nomDessin= ? ");
+
+				prepare.setString(1, nomDessin);
+
+				ResultSet result = prepare.executeQuery();
+
+				while (result.next()) {
+					String nom = result.getString("nom");
+					int x1 = result.getInt("xPoint1");
+					int y1 = result.getInt("yPoint1");
+					
+					int x2 = result.getInt("xPoint2");
+					int y2 = result.getInt("yPoint2");
+					
+					int x3 = result.getInt("xPoint3");
+					int y3 = result.getInt("yPoint3");
+
+					Triangle triangle= new Triangle(nom, new Point(x1,y1) , new Point(x2,y2),new Point(x3,y3));
+					res.add(triangle);
+
+				}
+			}
+			catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+
+
+		}
+
+		return res;
+
+	}
+
 	
 	
 	

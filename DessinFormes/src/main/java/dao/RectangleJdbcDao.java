@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import main.java.forme.Rectangle;
 
@@ -12,19 +14,7 @@ import main.java.forme.Rectangle;
  * 
  * CRUD pour acceder a la table RECTANGLE sur la base de donnees DERBY via jdbc
  * 
- * 
- * La table FORME contient les colonnes      
- *        nom
- *        type
- *        point1 ( Rectangle : centre du Rectangle,
- *        		   carre ou rectangle : point en haut à gauche
- *                 triangle : point 1
- *        point2 (uniquement pour un triangle)
- *        point3 (uniquement pour un triangle)
- *        largeur ( pour un carre : largeur = coté
- *                  pour un triangle : non utilise)
- *        longueur (uniquement pour un rectangle)
- * 
+
  * 
  *   La table RECTANGLE contient les colonnes      
  *        nom
@@ -32,6 +22,7 @@ import main.java.forme.Rectangle;
  *        yHautGauche : y du point en haut et a gauche
  *        largeur 
  *        longueur 
+ *        
  * 
  * 
  * 
@@ -45,6 +36,8 @@ public class RectangleJdbcDao extends DAO <Rectangle>  {
 	
 	// connexion a la base de donnees
 	Connection connect ;
+	
+	String nomDessin;
 	
 	
 	/**
@@ -63,10 +56,12 @@ public class RectangleJdbcDao extends DAO <Rectangle>  {
 	/**
 	 * Constructeur
 	 * @param connect
+	 * @param nomDessin
 	 */
-	public RectangleJdbcDao (Connection connect ) {
+	public RectangleJdbcDao (Connection connect , String nomDessin) {
 				
 		this.connect = connect;
+		this.nomDessin = nomDessin;
 	}
 	
 	
@@ -86,9 +81,14 @@ public class RectangleJdbcDao extends DAO <Rectangle>  {
 			if ((connect != null)   && (find(rectangle.getNom()) == null) ){
 
 				try {
+					String chaineSQL ;
 					
-					String chaineSQL = "INSERT INTO RECTANGLE (nom,xHautGauche,yHautGauche,largeur,longueur) VALUES (?,?,?,?,?)";
-
+					if (nomDessin != null) {
+						chaineSQL = "INSERT INTO RECTANGLE (nom,xHautGauche,yHautGauche,largeur,longueur,nomDessin) VALUES (?,?,?,?,?,?)";
+					}
+					else {
+						chaineSQL = "INSERT INTO RECTANGLE (nom,xHautGauche,yHautGauche,largeur,longueur) VALUES (?,?,?,?,?)";
+					}
 					prepare = connect.prepareStatement(chaineSQL);
 					prepare.setString(1, rectangle.getNom());
 					prepare.setInt(2, rectangle.getPointHautGauche().x);
@@ -96,6 +96,10 @@ public class RectangleJdbcDao extends DAO <Rectangle>  {
 					prepare.setInt(4, rectangle.getLargeur());
 					prepare.setInt(5, rectangle.getLongueur());
 
+					if (nomDessin != null) {
+						prepare.setString(6, nomDessin);
+					}
+					
 					int result = prepare.executeUpdate();
 					
 					assert result == 1 ;
@@ -129,7 +133,8 @@ public class RectangleJdbcDao extends DAO <Rectangle>  {
 			PreparedStatement prepare =null;
 
 
-			if (connect != null) {
+			// si la connexion a la base est OK et que le Rectangle est  deja cree en base
+			if ((connect != null)   && (find(rectangle.getNom()) != null) ){
 
 				try {
 
@@ -240,6 +245,51 @@ public class RectangleJdbcDao extends DAO <Rectangle>  {
 
 	}
 
+	
+	/**
+	 * Recherche des rectangles à partir du nom du dessin
+	 * @param nomDessin
+	 * @return
+	 */
+	public List<Rectangle> findFormes(String nomDessin) {
+
+		List<Rectangle> res = new ArrayList<>();
+
+		PreparedStatement prepare =null;
+		if (connect != null) {
+
+			try {
+				prepare = connect.prepareStatement("SELECT * FROM RECTANGLE WHERE nomDessin= ? ");
+
+				prepare.setString(1, nomDessin);
+
+				ResultSet result = prepare.executeQuery();
+
+				while (result.next()) {
+					String nom = result.getString("nom");
+					int x = result.getInt("xHautGauche");
+					int y = result.getInt("yHautGauche");
+					int largeur = result.getInt("largeur");
+					int longueur = result.getInt("longueur");
+					
+					Rectangle rectangle = new Rectangle(nom, x, y, largeur, longueur);
+					res.add(rectangle);
+
+				}
+			}
+			catch (SQLException ex) {
+				ex.printStackTrace();
+			}
+
+
+		}
+
+		return res;
+
+	}
+
+	
+	
 	
 	
 	

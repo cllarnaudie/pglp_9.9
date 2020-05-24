@@ -10,7 +10,7 @@ import java.sql.SQLException;
 /**
  * Connection au SGBD  DERBY
  * 
- * La base usersdb et les tables de la base ont ete crees via l utilitaire ij de DERBY
+ * La base dessinbd et les tables de la base ont ete crees via l utilitaire ij de DERBY
  * 
  * 
  * @author claire
